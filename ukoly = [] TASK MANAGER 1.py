@@ -5,6 +5,7 @@ def pridat_ukol():
         nazev = input("Zadejte název úkolu: ")
         if nazev == "":
             print("Název úkolu nesmí být prázdný. Zkuste to znovu.\n")
+            print("Název úkolu nesmí být prázdný. Zkuste to znovu.\n")
             continue
 
         popis = input("Zadejte popis úkolu: ")
