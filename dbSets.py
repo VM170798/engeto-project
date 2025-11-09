@@ -6,15 +6,15 @@ Base = declarative_base()
 
 # Definice databázového modelu pro tasky, tak jak se ti vytvori tabulka v databazi (z dokumentace SQLAlchemy)
 class Task(Base):
-    __tablename__ = 'tasks'
+    __tablename__ = 'UKOLY'
 
     # Definice sloupcu tabulky
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
-    description = Column(String(250), nullable=False)
-    is_deleted = Column(Boolean, default=False)
-    status = Column(Integer, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    Jmeno = Column(String(50), nullable=False)
+    Popis = Column(String(250), nullable=False)
+    smazano = Column(Boolean, default=False)
+    Stav = Column(Integer, nullable=False)
+    Vytvoreno = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
     updated_at = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
 
     # Ukazka toho jak si muzes definovat reprezentaci teto tridy pro lepsi vypis do konzole nebo logu pri pouziti funkce print() nebo str()

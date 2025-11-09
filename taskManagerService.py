@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -10,12 +11,13 @@ from taskStateEnum import TaskStatus
 DB_NAME = "taskManager_db"
 #uzivatelske jmeno, pri instalaci mysql se vytvori uzivatel root, ktery ma prava na vytvareni databazi
 DB_USER = "root"
+DB_PORT = "3306"
 #heslo pro uzivatele postgres, pokud jsi si ho pri instalaci nastavil jine, zmen to tady, bei ti to na localhostu, takze to je fuk, jen to musi sedet s tim co jsi nastavil pri instalaci
-DB_PASS = ""
+DB_PASS = "Czclone1998"
 #hostitel, na kterem bezi postgresql server, pokud bezi na stejnem stroji jako tato aplikace, tak to muze zustat localhost
 DB_HOST = "localhost"
 
-DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class TaskManagerService:
     def __init__(self):
@@ -83,9 +85,9 @@ class TaskManagerService:
                 case 2:
                     self.__update_task()
                 case 3:
-                    self.__list_tasks()
+                    self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value])
                 case 4:
-                    self.__list_tasks(True)
+                    self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value], True)
                 case 5:
                     self.__delete_task()
                 case _:
@@ -112,7 +114,7 @@ class TaskManagerService:
     def __add_task(self, name: str, description: str) -> VmTask | None:
         result = None
         #vytvorim si novou databazovou entitu
-        new_task = Task(name=name, description=description, status=TaskStatus.New.value)
+        new_task = Task(name=name, description=description, status=TaskStatus.Nezahajeno.value)
 
         #pridam ji do session (transakce/databaze)
         self.db.add(new_task)
@@ -126,20 +128,22 @@ class TaskManagerService:
         return self.task_entity_to_view_model(new_task)
 
     def __update_task(self):
+        self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value])
         self.print_message_with_divider("Update Task:")
         while True:
             task_id_input = self.get_validated_user_input("Task ID", "Enter task ID to update: ")
+            
             try:
                 task_id = int(task_id_input)
                 # zkusim najit task podle id
                 task = self.db.query(Task).filter(Task.id == task_id, Task.is_deleted == False).first()
                 if task:
-                    new_name = self.get_validated_user_input("Task name", f"Enter new task name {task.name} (Press enter to keep the name): ", task.name)
-                    new_description = self.get_validated_user_input("Task description", f"Enter new task description {task.description} (Press enter to keep the description): ", task.description)
-                    task.name = new_name
-                    task.description = new_description
+                    while user_input == "" or user_input not in [1,2]:
+                        print(f"\033[93m1. Hotovo, 2. Probiha\033[0m")
+                        user_input = input("Zvol moznost")
+                    
+                    task.Stav = int(user_input) + 1
                     task.updated_at = datetime.datetime.now(datetime.UTC)
-                    task.status = TaskStatus.Updated.value
                     self.db.commit()
                     self.db.refresh(task)
                     updated_task = self.task_entity_to_view_model(task)
@@ -150,13 +154,13 @@ class TaskManagerService:
             except ValueError:
                 print("\033[93mInvalid Task ID. Please enter a numeric value.\033[0m")
 
-    def __list_tasks(self, include_deleted = False):
+    def __list_tasks(self, status_list: List[int] = [], include_deleted = False):
         self.print_message_with_divider("Listing all tasks:")
         #ziskam vsechny tasky, podle toho jestli chci i smazane nebo ne na zaklade parametru include_deleted
         if include_deleted:
             all_available_tasks = self.db.query(Task).all()
         else:
-            all_available_tasks = self.db.query(Task).filter(Task.is_deleted == False).all()
+            all_available_tasks = self.db.query(Task).filter(Task.is_deleted == False, Task.Stav in [status_list]).all()
 
         for task in all_available_tasks:
             print(f"ID: {task.id}, Name: {task.name}, Description: {task.description}, Status: {TaskStatus(task.status).name}, Created At: {task.created_at}, Updated At: {task.updated_at}")
