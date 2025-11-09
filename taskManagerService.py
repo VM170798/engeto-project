@@ -8,7 +8,7 @@ from vModels import VmTask
 from taskStateEnum import TaskStatus
 
 DB_NAME = "taskManager_db"
-#uzivatelske jmeno, pri instalaci postgresql se vytvori uzivatel postgres, ktery ma prava na vytvareni databazi
+#uzivatelske jmeno, pri instalaci mysql se vytvori uzivatel root, ktery ma prava na vytvareni databazi
 DB_USER = "root"
 #heslo pro uzivatele postgres, pokud jsi si ho pri instalaci nastavil jine, zmen to tady, bei ti to na localhostu, takze to je fuk, jen to musi sedet s tim co jsi nastavil pri instalaci
 DB_PASS = ""
@@ -38,11 +38,14 @@ class TaskManagerService:
 
     # metoda pro ziskani validovaneho vstupu od uzivatele, ktery nesmi byt prazdny retezec, taky jsme uz probirali
     @staticmethod
-    def get_validated_user_input(input_name, input_request_description):
+    def get_validated_user_input(input_name, input_request_description, original_value: str = None):
         user_input = input(input_request_description)
-        while user_input == "":
+        while original_value is None and user_input == "":
             print(f"\033[93m{input_name} cannot be empty. Please try again.\033[0m")
             user_input = input(input_request_description)
+
+        if original_value is not None and user_input == "":
+            return original_value
 
         return user_input
 
@@ -87,6 +90,7 @@ class TaskManagerService:
                     self.__delete_task()
                 case _:
                     print("The value you have provided does not correspond to any available option.")
+
         except Exception as e:
             #kdyz nastane chyba, tak provedu rollback, aby se zmeny neprojevily v databazi
             self.db.rollback()
@@ -130,8 +134,8 @@ class TaskManagerService:
                 # zkusim najit task podle id
                 task = self.db.query(Task).filter(Task.id == task_id, Task.is_deleted == False).first()
                 if task:
-                    new_name = self.get_validated_user_input("Task name", "Enter new task name: ")
-                    new_description = self.get_validated_user_input("Task description", "Enter new task description: ")
+                    new_name = self.get_validated_user_input("Task name", f"Enter new task name {task.name} (Press enter to keep the name): ", task.name)
+                    new_description = self.get_validated_user_input("Task description", f"Enter new task description {task.description} (Press enter to keep the description): ", task.description)
                     task.name = new_name
                     task.description = new_description
                     task.updated_at = datetime.datetime.now(datetime.UTC)
@@ -164,12 +168,14 @@ class TaskManagerService:
         result = None
 
         while not is_deleted:
-            task_id_input = self.get_validated_user_input("Task ID", "Enter task ID to delete: ")
-            # opet tady neresim jakou strategii pouzivam, to uz resi persistence service
+            task_id_input = self.get_validated_user_input("Task ID", "Enter task ID to delete (or 0 to exit delete operation): ")
             try:
                 task_id = int(task_id_input)
+                if task_id == 0:
+                    print("\033[93mDelete operation cancelled by user.\033[0m")
+                    break
                 # zkusim najit task podle id
-                task = self.db.query(Task).filter(Task.id == task_id).first()
+                task = self.db.query(Task).filter(Task.id == task_id, Task.is_deleted == False).first()
                 if task:
                     # kdyz jsem nasel, oznacim ho jako smazany
                     task.is_deleted = True

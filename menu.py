@@ -1,6 +1,5 @@
 from taskManagerService import TaskManagerService
 
-
 class Menu:
     task_manager_service = None
     def __init__(self):

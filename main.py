@@ -1,4 +1,4 @@
-#musi si naintalovat nasledujici baliky popmoci prikazu , je to ta alchemy, ten driver a nejake extensions a pytest pak pro testovani
+#musis si naintalovat nasledujici baliky popmoci prikazu , je to ta alchemy, ten driver a nejake extensions a pytest pak pro testovani
 #pip(pip3) install SQLAlchemy mysql-connector-python sqlalchemy-utils alembic pytest
 from menu import Menu
 

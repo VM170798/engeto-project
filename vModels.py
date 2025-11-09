@@ -1,6 +1,5 @@
 import datetime
 
-from sqlalchemy import DateTime
 from taskStateEnum import TaskStatus
 
 class VmTask:

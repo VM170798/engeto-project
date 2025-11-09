@@ -4,11 +4,11 @@ import datetime
 
 Base = declarative_base()
 
-# Definice databázového modelu pro tasky, tak jak se ti vytvori tabulka v databazi
+# Definice databázového modelu pro tasky, tak jak se ti vytvori tabulka v databazi (z dokumentace SQLAlchemy)
 class Task(Base):
     __tablename__ = 'tasks'
 
-    # Definice sloupců tabulky
+    # Definice sloupcu tabulky
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
     description = Column(String(250), nullable=False)
