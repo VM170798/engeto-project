@@ -1,16 +1,16 @@
 import datetime
 
-from taskStateEnum import TaskStatus
+from taskStateEnum import StavUkolu
 
 class VmTask:
-    def __init__(self, task_id, name: str, description: str, status: TaskStatus, created_at: datetime.datetime, updated_at: datetime.datetime, is_deleted=False):
+    def __init__(self, task_id, nazev: str, popis: str, stav: StavUkolu, vytvoren: datetime.datetime, updated_at: datetime.datetime, smazan=False):
         self.task_id = task_id
-        self.name = name
-        self.description = description
-        self.status = status
-        self.is_deleted = is_deleted
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.Nazev = nazev
+        self.Popis = popis
+        self.Stav = stav
+        self.JeSmazan = smazan
+        self.vytvoren = vytvoren
+        self.aktualizovan = updated_at
 
     def __repr__(self):
-        return f"ID: {self.task_id}, Name: {self.name}, Description: {self.description}, Status: {self.status.name}, Is Deleted: {self.is_deleted}, Created At: {self.created_at}, Updated At: {self.updated_at}"
+        return f"ID: {self.task_id}, Name: {self.Nazev}, Description: {self.Popis}, Status: {self.Stav.name}, Is Deleted: {self.JeSmazan}, Created At: {self.vytvoren}, Updated At: {self.aktualizovan}"
