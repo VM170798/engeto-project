@@ -140,11 +140,17 @@ class TaskManagerService:
                 # zkusim najit task podle id
                 task = self.db.query(Task).filter(Task.id == task_id, Task.JeSmazan == False).first()
                 if task:
-                    while user_input == "" or user_input not in [1,2]:
-                        print(f"\033[93m1. Hotovo, 2. Probiha\033[0m")
-                        user_input = input("Zvol moznost")
-                    
-                    task.Stav = int(user_input) + 1
+                    print(f"1. Probiha, 2. Hotovo, 0 pro ukonceni bez zmeny")
+                    state_input = input("Zvol moznost: ")
+                    while state_input == "" or state_input not in ["0","1","2"]:
+                        print(f"\033[93mInvalid option. Please try again.\033[0m")
+                        state_input = input("Zvol moznost: ")
+
+                    if state_input == "0":
+                        print("\033[93mUpdate operation cancelled by user.\033[0m")
+                        break
+
+                    task.Stav = int(state_input) + 1
                     task.Aktualizovan = datetime.datetime.now(datetime.UTC)
                     self.db.commit()
                     self.db.refresh(task)

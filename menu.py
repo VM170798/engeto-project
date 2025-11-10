@@ -30,7 +30,7 @@ class Menu:
             print("1. Create Task")
             print("2. Update Task")
             print("3. List all tasks")
-            print("4. List all tasks (deleted included)")
+            print("4. List all tasks (vcetne hotovo)")
             print("5. Remove task")
             print("6. Exit program")
             user_choice = self.get_choice()
