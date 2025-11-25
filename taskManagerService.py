@@ -6,14 +6,15 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 from dbSets import Task, Base
 from vModels import VmTask
-from taskStateEnum import TaskStatus
+from taskStateEnum import StavUkolu
 
 DB_NAME = "taskManager_db"
 #uzivatelske jmeno, pri instalaci mysql se vytvori uzivatel root, ktery ma prava na vytvareni databazi
 DB_USER = "root"
 DB_PORT = "3306"
 #heslo pro uzivatele postgres, pokud jsi si ho pri instalaci nastavil jine, zmen to tady, bei ti to na localhostu, takze to je fuk, jen to musi sedet s tim co jsi nastavil pri instalaci
-DB_PASS = "Czclone1998"
+# !!!! tohle je presne ten case, proc tohle ma jit uplne mimo code base, ptz ja pwd nemam a ty ano... takze porad si to musime menit, kdyby to slo outside ode me, tak jde muj setup a naopak tvuj setup, nebylo by to hardcoded
+DB_PASS = ""
 #hostitel, na kterem bezi postgresql server, pokud bezi na stejnem stroji jako tato aplikace, tak to muze zustat localhost
 DB_HOST = "localhost"
 
@@ -55,13 +56,13 @@ class TaskManagerService:
     @staticmethod
     def task_entity_to_view_model(task_entity: Task) -> VmTask:
         return VmTask(
-            task_id=task_entity.id,
-            name=task_entity.name,
-            description=task_entity.description,
-            is_deleted=task_entity.is_deleted,
-            status=TaskStatus(task_entity.status),
-            created_at=task_entity.created_at,
-            updated_at=task_entity.updated_at
+            task_id = task_entity.id,
+            nazev = task_entity.Nazev,
+            popis = task_entity.Popis,
+            smazan = task_entity.JeSmazan,
+            stav = StavUkolu(task_entity.Stav),
+            vytvoren = task_entity.Vytvoren,
+            updated_at = task_entity.Aktualizovan
         )
 
     # to same jako vyse ale pro seznam entit
@@ -85,9 +86,9 @@ class TaskManagerService:
                 case 2:
                     self.__update_task()
                 case 3:
-                    self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value])
+                    self.__list_tasks([StavUkolu.Nezahajeno.value, StavUkolu.Probiha.value])
                 case 4:
-                    self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value], True)
+                    self.__list_tasks([StavUkolu.Nezahajeno.value, StavUkolu.Probiha.value], True)
                 case 5:
                     self.__delete_task()
                 case _:
@@ -109,12 +110,12 @@ class TaskManagerService:
         task_name = self.get_validated_user_input("Task name", "\nEnter task name: ")
         task_description = self.get_validated_user_input("Task description", "\nEnter task description: ")
         task = self.__add_task(task_name, task_description)
-        print(f"\033[92m\nTask {task.name} added with ID: {task.task_id}\033[0m")
+        print(f"\033[92m\nTask {task.Nazev} added with ID: {task.task_id}\033[0m")
 
-    def __add_task(self, name: str, description: str) -> VmTask | None:
+    def __add_task(self, nazev: str, popis: str) -> VmTask | None:
         result = None
         #vytvorim si novou databazovou entitu
-        new_task = Task(name=name, description=description, status=TaskStatus.Nezahajeno.value)
+        new_task = Task(Nazev = nazev, Popis = popis, Stav = StavUkolu.Nezahajeno.value)
 
         #pridam ji do session (transakce/databaze)
         self.db.add(new_task)
@@ -128,7 +129,8 @@ class TaskManagerService:
         return self.task_entity_to_view_model(new_task)
 
     def __update_task(self):
-        self.__list_tasks([TaskStatus.Nezahajeno.value, TaskStatus.Probiha.value])
+        user_input = None
+        self.__list_tasks([StavUkolu.Nezahajeno.value, StavUkolu.Probiha.value])
         self.print_message_with_divider("Update Task:")
         while True:
             task_id_input = self.get_validated_user_input("Task ID", "Enter task ID to update: ")
@@ -136,34 +138,44 @@ class TaskManagerService:
             try:
                 task_id = int(task_id_input)
                 # zkusim najit task podle id
-                task = self.db.query(Task).filter(Task.id == task_id, Task.is_deleted == False).first()
+                task = self.db.query(Task).filter(Task.id == task_id, Task.JeSmazan == False).first()
                 if task:
-                    while user_input == "" or user_input not in [1,2]:
-                        print(f"\033[93m1. Hotovo, 2. Probiha\033[0m")
-                        user_input = input("Zvol moznost")
-                    
-                    task.Stav = int(user_input) + 1
-                    task.updated_at = datetime.datetime.now(datetime.UTC)
+                    print(f"1. Probiha, 2. Hotovo, 0 pro ukonceni bez zmeny")
+                    state_input = input("Zvol moznost: ")
+                    while state_input == "" or state_input not in ["0","1","2"]:
+                        print(f"\033[93mInvalid option. Please try again.\033[0m")
+                        state_input = input("Zvol moznost: ")
+
+                    if state_input == "0":
+                        print("\033[93mUpdate operation cancelled by user.\033[0m")
+                        break
+
+                    task.Stav = int(state_input) + 1
+                    task.Aktualizovan = datetime.datetime.now(datetime.UTC)
                     self.db.commit()
                     self.db.refresh(task)
                     updated_task = self.task_entity_to_view_model(task)
-                    print(f"\033[92m\nTask {updated_task.name} with ID: {updated_task.task_id} has been updated\033[0m")
+                    print(f"\033[92m\nTask {updated_task.Nazev} with ID: {updated_task.task_id} has been updated\033[0m")
                     break
                 else:
                     print("\033[93mTask ID does not exist or is deleted. Please enter existing TaskID.\033[0m")
             except ValueError:
                 print("\033[93mInvalid Task ID. Please enter a numeric value.\033[0m")
 
-    def __list_tasks(self, status_list: List[int] = [], include_deleted = False):
+    def __list_tasks(self, status_list = None, include_deleted = False):
+        if status_list is None:
+            status_list = []
         self.print_message_with_divider("Listing all tasks:")
         #ziskam vsechny tasky, podle toho jestli chci i smazane nebo ne na zaklade parametru include_deleted
         if include_deleted:
             all_available_tasks = self.db.query(Task).all()
         else:
-            all_available_tasks = self.db.query(Task).filter(Task.is_deleted == False, Task.Stav in [status_list]).all()
+            all_available_tasks = self.db.query(Task).filter(Task.JeSmazan == False, Task.Stav.in_(status_list)).all()
+
+        sed = self.db.query(Task).all()
 
         for task in all_available_tasks:
-            print(f"ID: {task.id}, Name: {task.name}, Description: {task.description}, Status: {TaskStatus(task.status).name}, Created At: {task.created_at}, Updated At: {task.updated_at}")
+            print(f"ID: {task.id}, Nazev: {task.Nazev}, Popis: {task.Popis}, Stav: {StavUkolu(task.Stav).name}, Vytvoren: {task.Vytvoren}, Aktualizovan: {task.Aktualizovan}")
         if len(all_available_tasks) == 0:
             print("\033[93mNo tasks available.\033[0m")
 
@@ -179,16 +191,16 @@ class TaskManagerService:
                     print("\033[93mDelete operation cancelled by user.\033[0m")
                     break
                 # zkusim najit task podle id
-                task = self.db.query(Task).filter(Task.id == task_id, Task.is_deleted == False).first()
+                task = self.db.query(Task).filter(Task.id == task_id, Task.JeSmazan == False).first()
                 if task:
                     # kdyz jsem nasel, oznacim ho jako smazany
-                    task.is_deleted = True
-                    task.updated_at = datetime.datetime.now(datetime.UTC)
-                    task.status = TaskStatus.Closed.value
+                    task.JeSmazan = True
+                    task.Aktualizovan = datetime.datetime.now(datetime.UTC)
+                    task.Stav = StavUkolu.Hotovo.value
                     is_deleted = True
                     self.db.commit()
                     result = self.task_entity_to_view_model(task)
-                    print(f"\033[92m\nTask {task.name} with ID: {task.id} has been removed\033[0m")
+                    print(f"\033[92m\nTask {task.Nazev} with ID: {task.id} has been removed\033[0m")
                 else:
                     print("\033[93mTask ID does not exist. Please enter existing TaskID.\033[0m")
             except ValueError:
