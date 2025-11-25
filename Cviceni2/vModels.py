@@ -13,4 +13,4 @@ class VmTask:
         self.aktualizovan = updated_at
 
     def __repr__(self):
-        return f"ID: {self.task_id}, Name: {self.Nazev}, Description: {self.Popis}, Status: {self.Stav.name}, Is Deleted: {self.JeSmazan}, Created At: {self.vytvoren}, Updated At: {self.aktualizovan}"
+        return f"ID: {self.task_id}, Jmeno: {self.Nazev}, Popis: {self.Popis}, Stav: {self.Stav.name}, Je smazan: {self.JeSmazan}, Vytvoren: {self.vytvoren}, Aktualizovan: {self.aktualizovan}"
