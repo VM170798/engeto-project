@@ -4,9 +4,9 @@ from typing import List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from dbSets import Task, Base
-from vModels import VmTask
-from taskStateEnum import StavUkolu
+from Cviceni2.dbSets import Task, Base
+from Cviceni2.vModels import VmTask
+from Cviceni2.taskStateEnum import StavUkolu
 
 DB_NAME = "taskManager_db"
 #uzivatelske jmeno, pri instalaci mysql se vytvori uzivatel root, ktery ma prava na vytvareni databazi
