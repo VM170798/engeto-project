@@ -1,4 +1,4 @@
-from Cviceni2.taskManagerService import TaskManagerService
+from taskManagerService import TaskManagerService
 
 class Menu:
     task_manager_service = None

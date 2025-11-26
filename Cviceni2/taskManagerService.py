@@ -4,16 +4,16 @@ from typing import List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from Cviceni2.dbSets import Task, Base
-from Cviceni2.vModels import VmTask
-from Cviceni2.taskStateEnum import StavUkolu
+from dbSets import Task, Base
+from vModels import VmTask
+from taskStateEnum import StavUkolu
 
 DB_NAME = "taskManager_db"
 
 DB_USER = "root"
 DB_PORT = "3306"
 
-DB_PASS = ""
+DB_PASS = "Czclone1998"
 
 DB_HOST = "localhost"
 
@@ -22,12 +22,17 @@ DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/
 class TaskManagerService:
     def __init__(self):
         self.db = None
-        engine = create_engine(DATABASE_URL)
-        if not database_exists(engine.url):
-            print(f"Vytvor databazi {DB_NAME}")
-            create_database(engine.url)
-        self.engine = engine
-        self.connection = self.engine.connect()
+        try:
+            engine = create_engine(DATABASE_URL)
+            if not database_exists(engine.url):
+                print(f"Vytvor databazi {DB_NAME}")
+                create_database(engine.url)
+            self.engine = engine
+
+            self.connection = self.engine.connect()
+        except Exception as e:
+            print("neni DB")
+            exit()
         self._initialize_tables()
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self.Base = Base
@@ -105,7 +110,7 @@ class TaskManagerService:
         print("\n„Zadejte následující údaje pro vytvoření nového úkolu.")
        
         task_name = self.get_validated_user_input("Nazev ukolu", "\nZadejte jmeno ukolu: ")
-        task_description = self.get_validated_user_input("Popis ukolu", "\nVlozte popis ukulu: ")
+        task_description = self.get_validated_user_input("Popis ukolu", "\nVlozte popis ukolu: ")
         task = self.__add_task(task_name, task_description)
         print(f"\033[92m\nUkol {task.Nazev} addeVlozte s ID: {task.task_id}\033[0m")
 

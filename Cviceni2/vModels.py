@@ -1,6 +1,6 @@
 import datetime
 
-from Cviceni2.taskStateEnum import StavUkolu
+from taskStateEnum import StavUkolu
 
 class VmTask:
     def __init__(self, task_id, nazev: str, popis: str, stav: StavUkolu, vytvoren: datetime.datetime, updated_at: datetime.datetime, smazan=False):

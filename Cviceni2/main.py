@@ -1,5 +1,5 @@
 
-from Cviceni2.menu import Menu
+from menu import Menu
 
 def main():
    
