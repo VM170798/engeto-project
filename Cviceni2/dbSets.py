@@ -7,8 +7,6 @@ Base = declarative_base()
 
 class Task(Base):
     __tablename__ = 'ukoly'
-
-    
     id = Column(Integer, primary_key=True, autoincrement=True)
     Nazev = Column(String(50), nullable=False)
     Popis = Column(String(250), nullable=False)
@@ -16,7 +14,5 @@ class Task(Base):
     Stav = Column(Integer, nullable=False)
     Vytvoren = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
     Aktualizovan = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
-
-   
     def __repr__(self):
         return f"ID: {self.id}, Nazev: {self.Nazev}, Popis: {self.Popis}, Je oznacen jako smazany: {self.JeSmazan}, Stav: {self.Stav}, Vytvoren: {self.Vytvoren}, Aktualizovan {self.Aktualizovan}"

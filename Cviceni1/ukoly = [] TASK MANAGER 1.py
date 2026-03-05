@@ -1,5 +1,4 @@
-ukoly = [] 
-
+ukoly = []
 def pridat_ukol():
     while True:
         nazev = input("Zadejte název úkolu: ")

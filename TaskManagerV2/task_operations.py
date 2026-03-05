@@ -1,22 +1,8 @@
-"""
-Task operations module.
-This module contains all CRUD operations for tasks.
-"""
-
 from database import Ukol
 from datetime import datetime
 
 
 def pridat_ukol(session):
-    """
-    Přidá nový úkol do databáze.
-
-    Args:
-        session: SQLAlchemy session objekt
-
-    Returns:
-        bool: True pokud byl úkol úspěšně přidán, False jinak
-    """
     print("\n=== Přidání nového úkolu ===")
 
     while True:
@@ -49,16 +35,8 @@ def pridat_ukol(session):
 
 
 def zobrazit_ukoly(session):
-    """
-    Zobrazí všechny úkoly, které nejsou dokončené.
-
-    Args:
-        session: SQLAlchemy session objekt
-    """
     print("\n=== Seznam úkolů ===")
-
     try:
-        # Filtrujeme pouze úkoly se stavem "Nezahájeno" nebo "Probíhá"
         ukoly = session.query(Ukol).filter(
             Ukol.stav.in_(['Nezahájeno', 'Probíhá'])
         ).all()
@@ -81,19 +59,8 @@ def zobrazit_ukoly(session):
 
 
 def aktualizovat_ukol(session):
-    """
-    Aktualizuje stav úkolu.
-
-    Args:
-        session: SQLAlchemy session objekt
-
-    Returns:
-        bool: True pokud byl úkol úspěšně aktualizován, False jinak
-    """
     print("\n=== Aktualizace úkolu ===")
-
     try:
-        # Zobrazíme dostupné úkoly
         ukoly = session.query(Ukol).filter(
             Ukol.stav.in_(['Nezahájeno', 'Probíhá'])
         ).all()
@@ -107,8 +74,6 @@ def aktualizovat_ukol(session):
         for ukol in ukoly:
             nazev_zkraceny = ukol.nazev[:27] + "..." if len(ukol.nazev) > 30 else ukol.nazev
             print(f"{ukol.id:<5} {nazev_zkraceny:<30} {ukol.stav:<15}")
-
-        # Vybereme úkol k aktualizaci
         while True:
             try:
                 ukol_id = int(input("\nZadejte ID úkolu, který chcete aktualizovat: "))
@@ -120,8 +85,6 @@ def aktualizovat_ukol(session):
                     print("⚠ Úkol s tímto ID neexistuje nebo již byl dokončen. Zkuste to znovu.")
             except ValueError:
                 print("⚠ Neplatné ID! Zadejte prosím číslo.")
-
-        # Vybereme nový stav
         print("\nVyberte nový stav:")
         print("1. Probíhá")
         print("2. Hotovo")
@@ -149,19 +112,8 @@ def aktualizovat_ukol(session):
 
 
 def odstranit_ukol(session):
-    """
-    Odstraní úkol z databáze.
-
-    Args:
-        session: SQLAlchemy session objekt
-
-    Returns:
-        bool: True pokud byl úkol úspěšně odstraněn, False jinak
-    """
     print("\n=== Odstranění úkolu ===")
-
     try:
-        # Zobrazíme všechny úkoly
         ukoly = session.query(Ukol).all()
 
         if not ukoly:
@@ -173,8 +125,6 @@ def odstranit_ukol(session):
         for ukol in ukoly:
             nazev_zkraceny = ukol.nazev[:27] + "..." if len(ukol.nazev) > 30 else ukol.nazev
             print(f"{ukol.id:<5} {nazev_zkraceny:<30} {ukol.stav:<15}")
-
-        # Vybereme úkol k odstranění
         while True:
             try:
                 ukol_id = int(input("\nZadejte ID úkolu, který chcete odstranit: "))
@@ -186,8 +136,6 @@ def odstranit_ukol(session):
                     print("⚠ Úkol s tímto ID neexistuje. Zkuste to znovu.")
             except ValueError:
                 print("⚠ Neplatné ID! Zadejte prosím číslo.")
-
-        # Potvrzení odstranění
         potvrzeni = input(f"Opravdu chcete odstranit úkol '{ukol.nazev}'? (ano/ne): ").strip().lower()
 
         if potvrzeni in ['ano', 'a', 'yes', 'y']:

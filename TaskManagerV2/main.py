@@ -1,18 +1,7 @@
-"""
-Task Manager - Vylepšená verze s databází
-Tento program umožňuje správu úkolů s ukládáním do databáze.
-Podporuje operace: Create, Read, Update, Delete (CRUD)
-"""
-
 from database import pripojeni_db, vytvoreni_tabulky
 from task_operations import pridat_ukol, zobrazit_ukoly, aktualizovat_ukol, odstranit_ukol
 
-
 def hlavni_menu():
-    """
-    Hlavní menu programu.
-    Zobrazuje možnosti a zpracovává volby uživatele.
-    """
     while True:
         print("\n" + "=" * 50)
         print("        TASK MANAGER - Správce úkolů")
@@ -40,27 +29,16 @@ def hlavni_menu():
         else:
             print("⚠ Neplatná volba! Zadejte prosím číslo 1-5.")
 
-
 if __name__ == '__main__':
     print("🚀 Spouštím Task Manager...")
-
-    # Připojení k databázi
     engine, Session = pripojeni_db()
-
     if engine is None or Session is None:
         print("✗ Nepodařilo se připojit k databázi. Program se ukončuje.")
         exit(1)
-
-    # Vytvoření tabulky, pokud neexistuje
     vytvoreni_tabulky(engine)
-
-    # Vytvoření session pro práci s databází
     session = Session()
-
     try:
-        # Spuštění hlavního menu
         hlavni_menu()
     finally:
-        # Uzavření session při ukončení
         session.close()
         print("✓ Připojení k databázi bylo uzavřeno.")
