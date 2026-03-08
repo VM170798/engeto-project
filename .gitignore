@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE Folders
+.idea/             # JetBrains (PyCharm)
+.vscode/           # Visual Studio Code
+*.swp              # Vim
+.DS_Store          # macOS specific system files
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environment variables
+.env
