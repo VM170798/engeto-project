@@ -29,12 +29,6 @@ def vytvorit_connection_string(db_type=None, config=None):
 
     if db_type == 'mysql':
         return f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
-    elif db_type == 'postgresql':
-        return f"postgresql+psycopg2://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
-    elif db_type == 'mssql':
-        return f"mssql+pyodbc://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?driver=ODBC+Driver+17+for+SQL+Server"
-    elif db_type == 'sqlite':
-        return f"sqlite:///{config['database']}"
     else:
         raise ValueError(f"Nepodporovaný typ databáze: {db_type}")
 
