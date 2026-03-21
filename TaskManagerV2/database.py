@@ -1,11 +1,9 @@
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
 from config import DATABASE_TYPE, DB_CONFIG
 
 Base = declarative_base()
-
 
 class Ukol(Base):
     __tablename__ = 'ukoly'
@@ -19,7 +17,6 @@ class Ukol(Base):
     def __repr__(self):
         return f"<Ukol(id={self.id}, nazev='{self.nazev}', stav='{self.stav}')>"
 
-
 def vytvorit_connection_string(db_type=None, config=None):
     if db_type is None:
         db_type = DATABASE_TYPE
@@ -31,7 +28,6 @@ def vytvorit_connection_string(db_type=None, config=None):
         return f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
     else:
         raise ValueError(f"Nepodporovaný typ databáze: {db_type}")
-
 
 def pripojeni_db(db_type=None, config=None):
     try:
@@ -46,7 +42,6 @@ def pripojeni_db(db_type=None, config=None):
     except Exception as e:
         print(f"✗ Chyba při připojení k databázi: {e}")
         return None, None
-
 
 def vytvoreni_tabulky(engine):
     try:

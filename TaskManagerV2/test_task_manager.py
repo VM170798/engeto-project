@@ -23,7 +23,6 @@ def test_session():
     Base.metadata.drop_all(engine)
     engine.dispose()
 
-
 class TestPridatUkol:
 
     def test_pridat_ukol_pozitivni(self, test_session):
@@ -76,7 +75,6 @@ class TestPridatUkol:
         pocet_ukolu = test_session.query(Ukol).count()
         assert pocet_ukolu == 0, "Úkol s prázdným popisem by neměl být přidán"
 
-
 class TestAktualizovatUkol:
 
     def test_aktualizovat_ukol_pozitivni(self, test_session):
@@ -125,7 +123,6 @@ class TestAktualizovatUkol:
         dokonceny_ukol = test_session.query(Ukol).filter_by(id=ukol_id).first()
         assert dokonceny_ukol.stav == "Hotovo"
 
-
 class TestOdstranitUkol:
 
     def test_odstranit_ukol_pozitivni(self, test_session):
@@ -164,7 +161,6 @@ class TestOdstranitUkol:
         pocet_po = test_session.query(Ukol).count()
         assert pocet_pred == pocet_po
 
-
 class TestZobrazitUkoly:
 
     def test_zobrazit_ukoly_pozitivni_s_filtrem(self, test_session):
@@ -192,7 +188,6 @@ class TestZobrazitUkoly:
         # Ověření
         assert len(ukoly) == 0, "Seznam úkolů by měl být prázdný"
         assert ukoly == [], "Měl by být vrácen prázdný seznam"
-
 
 class TestKomplexniScenare:
 

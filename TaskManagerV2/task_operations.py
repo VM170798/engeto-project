@@ -1,7 +1,6 @@
 from database import Ukol
 from datetime import datetime
 
-
 def pridat_ukol(session):
     print("\n=== Přidání nového úkolu ===")
 
@@ -33,7 +32,6 @@ def pridat_ukol(session):
         print(f"✗ Chyba při přidávání úkolu: {e}")
         return False
 
-
 def zobrazit_ukoly(session):
     print("\n=== Seznam úkolů ===")
     try:
@@ -56,7 +54,6 @@ def zobrazit_ukoly(session):
         print()
     except Exception as e:
         print(f"✗ Chyba při zobrazování úkolů: {e}")
-
 
 def aktualizovat_ukol(session):
     print("\n=== Aktualizace úkolu ===")
@@ -109,7 +106,6 @@ def aktualizovat_ukol(session):
         session.rollback()
         print(f"✗ Chyba při aktualizaci úkolu: {e}")
         return False
-
 
 def odstranit_ukol(session):
     print("\n=== Odstranění úkolu ===")
